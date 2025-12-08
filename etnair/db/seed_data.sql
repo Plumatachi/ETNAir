@@ -19,13 +19,13 @@ VALUES
 
 INSERT INTO "booking" (idBooking, startDate, endDate, idUser, idHome)
 VALUES
--- Yoann → House Slytherin
+-- Yoann House Slytherin
 ('7a4c7c52-97a3-4b89-9d31-9b9cf69e2e90', '2025-12-01', '2025-12-05', 'dc986b12-e084-4bb0-88a9-0ba0070af9ec', 'ea7c4834-e164-45cf-ae73-410981b5f5a2'),
--- Erwan → House Gryffindor
+-- Erwan House Gryffindor
 ('8b9ec4b1-9a1f-4f6a-bc58-afb1c95f8fd6', '2025-12-10', '2025-12-15', 'f54016fa-7eb8-48a9-a64e-421f1cef03e1', 'dca3a93c-85e0-4a7d-8f26-d05871c28efd'),
--- Zineb → House Ravenclaw
+-- Zineb House Ravenclaw
 ('33f4ccbe-85a0-40ac-9a65-1f83e17536b7', '2025-12-03', '2025-12-08', 'f9f6c1ac-d1a2-4eef-9d00-3c7ff4cbb7d6', '1a09de40-7e64-4312-a815-74cde1dfb79d'),
--- Yoann → House Hufflepuff
+-- Yoann House Hufflepuff
 ('d6d7586d-7ed0-4eef-b7f8-86bb7bcf4b5e', '2025-12-20', '2025-12-25', 'dc986b12-e084-4bb0-88a9-0ba0070af9ec', '8d1f01f0-6e7d-4d58-a7fb-2ef76ffd5e55');
 
 INSERT INTO "disponibility" (startDate, endDate, idHome)
