@@ -1,15 +1,4 @@
--- Create Database and drop if existing database
-DROP DATABASE IF EXISTS etnair_database;
-CREATE DATABASE IF NOT EXISTS etnair_database;
-\c etnair_database;
-
--------------------------------------------------------
-
-CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
-
--------------------------------------------------------
-
-CREATE TABLE "USER" (
+CREATE TABLE "user" (
     idUser UUID PRIMARY KEY,
     username VARCHAR(100) NOT NULL, 
     email VARCHAR(320) NOT NULL UNIQUE,
@@ -17,11 +6,11 @@ CREATE TABLE "USER" (
     userType VARCHAR(20) NOT NULL
 );
 
-CREATE INDEX idx_user_username ON "USER"(username);
+CREATE INDEX idx_user_username ON "user"(username);
 
 -------------------------------------------------------
 
-CREATE TABLE HOME (
+CREATE TABLE "home" (
     idHome UUID PRIMARY KEY, 
     nameHome VARCHAR(100) NOT NULL,
     description TEXT NOT NULL,
@@ -30,17 +19,17 @@ CREATE TABLE HOME (
     
     CONSTRAINT fk_posted
         FOREIGN KEY (idUser) 
-        REFERENCES "USER"(idUser)
+        REFERENCES "user"(idUser)
         ON DELETE CASCADE
 );
 
-CREATE INDEX idx_home_nameHome ON HOME(nameHome);
-CREATE INDEX idx_home_price ON HOME(price);
-CREATE INDEX idx_home_idUser ON HOME(idUser);
+CREATE INDEX idx_home_nameHome ON "home"(nameHome);
+CREATE INDEX idx_home_price ON "home"(price);
+CREATE INDEX idx_home_idUser ON "home"(idUser);
 
 -------------------------------------------------------
 
-CREATE TABLE BOOKING (
+CREATE TABLE "booking" (
     idBooking UUID PRIMARY KEY,
     startDate DATE NOT NULL,
     endDate DATE NOT NULL,
@@ -49,21 +38,21 @@ CREATE TABLE BOOKING (
 
     CONSTRAINT fk_bookedBy
         FOREIGN KEY (idUser)
-        REFERENCES "USER"(idUser)
+        REFERENCES "user"(idUser)
         ON DELETE CASCADE,
     
     CONSTRAINT fk_bookedIn
         FOREIGN KEY (idHome)
-        REFERENCES HOME(idHome)
+        REFERENCES "home"(idHome)
         ON DELETE CASCADE
 );
 
-CREATE INDEX idx_booking_idUser ON BOOKING(idUser);
-CREATE INDEX idx_booking_idHome ON BOOKING(idHome);
+CREATE INDEX idx_booking_idUser ON "booking"(idUser);
+CREATE INDEX idx_booking_idHome ON "booking"(idHome);
 
 -------------------------------------------------------
 
-CREATE TABLE DISPONIBILITY (
+CREATE TABLE "disponibility" (
     idDisponibility SERIAL PRIMARY KEY,
     startDate DATE NOT NULL, 
     endDate DATE NOT NULL,
@@ -71,8 +60,8 @@ CREATE TABLE DISPONIBILITY (
 
     CONSTRAINT fk_define
         FOREIGN KEY (idHome)
-        REFERENCES HOME(idHome)
+        REFERENCES "home"(idHome)
         ON DELETE CASCADE
 );
 
-CREATE INDEX idx_disponibility_idHome ON DISPONIBILITY(idHome);
+CREATE INDEX idx_disponibility_idHome ON "disponibility"(idHome);
