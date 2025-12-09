@@ -8,13 +8,17 @@ Cet environnement contient :
 
 # Arborescence
 
+```md
 /etnair
 ├── api
 ├── db
 ├── docker-compose.yml
 └── README.md
+```
 
 # Cloner le projet
 
+```bash
 git clone git@rendu-git.etna-alternance.net:module-10092/activity-54705/group-1068853.git 
 cd etnair
+```
