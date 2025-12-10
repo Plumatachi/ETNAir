@@ -3,9 +3,6 @@ const { generateToken } = require('../utils/jwt');
 
 const register = async (req, res) => {
     try {
-        console.log('🔍 req.body:', req.body);
-        console.log('🔍 req.headers:', req.headers);
-
         const { email, password, username, usertype = 'LOCATOR' } = req.body;
 
         if (!email || !password || !username) {
