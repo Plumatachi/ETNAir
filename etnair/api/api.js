@@ -16,7 +16,11 @@ app.use((req, res, next) => {
 });
 
 const authRoutes = require('./src/routes/auth');
+const userRoutes = require('./routes/user');
+const homeRoutes = require('./routes/home');
 app.use('/api/auth', authRoutes);
+app.use('/api/user', userRoutes);
+app.use('/api/home', homeRoutes);
 
 app.use((req, res) => {
   console.log(`⚠️ Route 404: ${req.method} ${req.path}`);

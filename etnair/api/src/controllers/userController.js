@@ -36,7 +36,7 @@ const editProfile = async (req, res) => {
         const updatedUser = await userService.update(id, data);
         if (!updatedUser) {
             return res.status(404).json({
-                error: 'Utilisateur non modifié'
+                error: 'Utilisateur non trouvé'
             });
         }
 
