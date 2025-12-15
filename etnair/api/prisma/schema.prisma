@@ -1,12 +1,5 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
-  provider = "prisma-client"
-  output   = "../generated/prisma"
+  provider = "prisma-client-js"
 }
 
 datasource db {
@@ -14,79 +7,74 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-enum UserType {
-  LOCATOR
-  OWNER
-}
-
 model User {
-  idUser   String   @id @default(uuid()) @db.Uuid
-  username String   @db.VarChar(100)
-  email    String   @unique @db.VarChar(320)
-  password String   @db.VarChar(100)
-  userType UserType @default(LOCATOR)
+  iduser   String    @id @db.Uuid
+  username String    @db.VarChar(100)
+  email    String    @unique @db.VarChar(320)
+  password String    @db.VarChar(100)
+  usertype UserType  @default(LOCATOR)
+  booking  Booking[]
+  home     Home[]
 
-  homes    Home[]
-  bookings Booking[]
-
-  @@index([username], name: "idx_user_username")
+  @@index([username], map: "idx_user_username")
   @@map("user")
 }
 
 model Home {
-  idHome      String @id @default(uuid()) @db.Uuid
-  nameHome    String @db.VarChar(100)
-  description String @db.Text
-  price       Int
-  idUser      String @db.Uuid
+  idhome        String          @id @db.Uuid
+  namehome      String          @db.VarChar(100)
+  description   String
+  price         Int
+  iduser        String          @db.Uuid
+  booking       Booking[]
+  disponibility Disponibility[]
+  user          User            @relation(fields: [iduser], references: [iduser], onDelete: Cascade, onUpdate: NoAction, map: "fk_home_user")
+  home_image    HomeImage[]
 
-  user            User            @relation(fields: [idUser], references: [idUser], onDelete: Cascade)
-  bookings        Booking[]
-  disponibilities Disponibility[]
-  images          HomeImage[]
-
-  @@index([nameHome], name: "idx_home_nameHome")
-  @@index([price], name: "idx_home_price")
-  @@index([idUser], name: "idx_home_idUser")
+  @@index([price], map: "idx_home_price")
+  @@index([iduser], map: "idx_home_iduser")
+  @@index([namehome], map: "idx_home_namehome")
   @@map("home")
 }
 
 model Booking {
-  idBooking String   @id @default(uuid()) @db.Uuid
-  startDate DateTime @db.Date
-  endDate   DateTime @db.Date
-  idUser    String   @db.Uuid
-  idHome    String   @db.Uuid
+  idbooking String   @id @db.Uuid
+  startdate DateTime @db.Date
+  enddate   DateTime @db.Date
+  iduser    String   @db.Uuid
+  idhome    String   @db.Uuid
+  home      Home     @relation(fields: [idhome], references: [idhome], onDelete: Cascade, onUpdate: NoAction, map: "fk_booking_home")
+  user      User     @relation(fields: [iduser], references: [iduser], onDelete: Cascade, onUpdate: NoAction, map: "fk_booking_user")
 
-  user User @relation(fields: [idUser], references: [idUser], onDelete: Cascade)
-  home Home @relation(fields: [idHome], references: [idHome], onDelete: Cascade)
-
-  @@index([idUser], name: "idx_booking_idUser")
-  @@index([idHome], name: "idx_booking_idHome")
+  @@index([idhome], map: "idx_booking_idhome")
+  @@index([iduser], map: "idx_booking_iduser")
   @@map("booking")
 }
 
 model Disponibility {
-  idDisponibility Int      @id @default(autoincrement())
-  startDate       DateTime @db.Date
-  endDate         DateTime @db.Date
-  idHome          String   @db.Uuid
+  iddisponibility Int      @id @default(autoincrement())
+  startdate       DateTime @db.Date
+  enddate         DateTime @db.Date
+  idhome          String   @db.Uuid
+  home            Home     @relation(fields: [idhome], references: [idhome], onDelete: Cascade, onUpdate: NoAction, map: "fk_dispo_home")
 
-  home Home @relation(fields: [idHome], references: [idHome], onDelete: Cascade)
-
-  @@index([idHome], name: "idx_disponibility_idHome")
+  @@index([idhome], map: "idx_disponibility_idhome")
   @@map("disponibility")
 }
 
 model HomeImage {
-  idImage  String @id @default(uuid()) @db.Uuid
-  idHome   String @db.Uuid
-  imageUrl String @db.VarChar(500)
-  imageKey String @db.VarChar(500)
-  orderNum Int    @default(0)
+  idimage  String @id @db.Uuid
+  idhome   String @db.Uuid
+  imageurl String @db.VarChar(500)
+  imagekey String @db.VarChar(500)
+  ordernum Int?   @default(0)
+  home     Home   @relation(fields: [idhome], references: [idhome], onDelete: Cascade, onUpdate: NoAction, map: "fk_image_home")
 
-  home Home @relation(fields: [idHome], references: [idHome], onDelete: Cascade)
-
-  @@index([idHome])
+  @@index([idhome], map: "idx_homeimage_idhome")
   @@map("home_image")
+}
+
+enum UserType {
+  LOCATOR
+  OWNER
 }

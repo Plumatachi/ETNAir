@@ -12,12 +12,12 @@ node_modules/
 out/
 
 # Prisma
-/prisma/migrations/
+/api/prisma/migrations/
 /prisma/*.db
 /prisma/*.db-journal
 
 # IDE and Editor
-.idea/
+../.idea
 .vscode/
 
 # OS generated files
@@ -50,3 +50,6 @@ package-lock.json
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+
+# Minio
+/minio
