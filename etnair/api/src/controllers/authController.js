@@ -89,30 +89,7 @@ const login = async (req, res) => {
     }
 };
 
-const getProfile = async (req, res) => {
-    try {
-        if (!req.user) {
-            return res.status(401).json({
-                error: 'Non authentifié'
-            });
-        }
-
-        const user = await userService.findById(req.user.id);
-        if (!user) {
-            return res.status(404).json({
-                error: 'Utilisateur non trouvé'
-            });
-        }
-
-        res.json({ user });
-    } catch (error) {
-        console.error('Erreur lors de la récupération du profil:', error);
-        res.status(500).json({ error: 'Erreur serveur' });
-    }
-};
-
 module.exports = {
     register,
-    login,
-    getProfile
+    login
 };
