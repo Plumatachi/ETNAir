@@ -42,7 +42,71 @@ const getAllHomes = async (req, res) => {
     }
 };
 
+const getHome = async (req, res) => {
+    try {
+        const id = req.params.id;
+
+        const home = await homeService.findById(id);
+        if (!home) {
+            return res.status(404).json({
+                error: 'Domicile non trouvé'
+            });
+        }
+
+        res.json({ home });
+    } catch (error) {
+        console.error('Erreur lors de la récupération du domicile:', error);
+        res.status(500).json({ error: 'Erreur serveur' });
+    }
+};
+
+const editHome = async (req, res) => {
+    try {
+        const id = req.params.id;
+        const iduser = req.user.id;
+        const data = req.body;
+
+        const home = await homeService.findById(id);
+        if (!home) {
+            return res.status(404).json({ error: 'Logement non trouvé' });
+        }
+        if (home.iduser !== iduser) {
+            return res.status(403).json({ error: 'Non autorisé' });
+        }
+
+        const updatedHome = await homeService.update(id, data);
+        res.json({ home: updatedHome });
+    } catch (error) {
+        console.error('Erreur lors de la modification du logement:', error);
+        res.status(500).json({ error: 'Erreur serveur' });
+    }
+}
+
+const deleteHome = async (req, res) => {
+    try {
+        const id = req.params.id;
+        const iduser = req.user.id;
+
+        const home = await homeService.findById(id);
+        if (!home) {
+            return res.status(404).json({ error: 'Logement non trouvé' });
+        }
+        if (home.iduser !== iduser) {
+            return res.status(403).json({ error: 'Non autorisé' });
+        }
+
+        await homeService.delete(id);
+        res.json({ message: 'Logement supprimé avec succès' });
+    } catch (error) {
+        console.error('Erreur lors de la suppression du logement:', error);
+        res.status(500).json({ error: 'Erreur serveur' });
+    }
+};
+
 module.exports = {
     createHome, 
-    getAllHomes,
+    getAllHomes, 
+    getHome, 
+    editHome, 
+    deleteHome
 };

@@ -2,7 +2,7 @@ const prisma = require('../config/database');
 const crypto = require('crypto');
 
 class HomeService {
-    async create({ namehome, description, price }) {
+    async create({ namehome, description, price, iduser }) {
         return prisma.home.create({
             data : {
                 idhome: crypto.randomUUID(),
