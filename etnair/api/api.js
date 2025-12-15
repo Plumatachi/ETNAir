@@ -11,6 +11,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 app.use((req, res, next) => {
+  console.log(`📥 ${req.method} ${req.path}`);
   next();
 });
 
@@ -22,6 +23,14 @@ app.get('/health', (req, res) => {
 });
 
 app.use('/api/auth', authRoutes);
+
+app.use((err, req, res, next) => {
+  console.error('❌ Erreur serveur:', err);
+  res.status(err.status || 500).json({
+    error: err.message || 'Erreur interne du serveur',
+    ...(process.env.NODE_ENV === 'development' && { stack: err.stack })
+  });
+});
 
 app.use((req, res) => {
   console.log(`⚠️ Route 404: ${req.method} ${req.path}`);
