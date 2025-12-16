@@ -49,6 +49,25 @@ class UserService {
         const user = await this.findByEmail(email);
         return !!user;
     }
+
+    async update(id, data) {
+        return prisma.user.update({
+            where: { iduser: id }, 
+            data, 
+            select: { 
+                iduser: true,
+                email: true,
+                username: true,
+                usertype: true,
+            },
+        });
+    }
+
+    async delete(id) {
+        return prisma.user.delete({
+            where: { iduser: id },
+        });
+    }
 }
 
 module.exports = new UserService();
