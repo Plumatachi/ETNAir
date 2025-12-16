@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 
 stages:
   - test
@@ -6,3 +7,46 @@ hello-job:
   stage: test
   script:
     - echo "Hello, GitLab CI/CD!"
+=======
+stages:
+  - test
+  - security
+  - deploy
+
+variables:
+  NODE_ENV: test
+
+test:
+  stage: test
+  image: node:18
+  script:
+    - cd api
+    - npm install
+    - npm test
+  only:
+    - main
+    - merge_requests
+
+security:
+  stage: security
+  image: node:18
+  script:
+    - cd api
+    - npm install
+    - npm audit --audit-level=high
+  only:
+    - main
+    - merge_requests
+
+deploy:
+  stage: deploy
+  image:
+    name: bitnami/kubectl:latest
+    entrypoint: [""]
+  script:
+    - echo "Déploiement de l'API sur kubernetes"
+    - kubectl apply -f k8s/secrets.yaml
+    - kubectl apply -f k8s/
+  only:
+    - main
+>>>>>>> 9f8034f ([#19] Configurer une pipeline CI/CD dans GitLab)
