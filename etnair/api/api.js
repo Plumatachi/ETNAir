@@ -1,6 +1,9 @@
 const express = require('express');
 require('dotenv').config();
 const prisma = require('./src/config/database');
+const authRoutes = require('./src/routes/auth');
+const swaggerUi = require('swagger-ui-express');
+const swaggerSpec = require('./src/swagger/swagger.config');
 
 console.log('🚀 Démarrage de l\'api...');
 console.log('📦 Variables d\'environnement chargées');
@@ -15,12 +18,23 @@ app.use((req, res, next) => {
   next();
 });
 
-const authRoutes = require('./src/routes/auth');
 app.use('/api/auth', authRoutes);
 
 app.use((req, res) => {
   console.log(`⚠️ Route 404: ${req.method} ${req.path}`);
   res.status(404).json({ error: 'Route non trouvée' });
+});
+
+app.use('/api-docs', swaggerUi.serve);
+app.get('/api-docs', swaggerUi.setup(swaggerSpec, {
+  explorer: true,
+  customCss: '.swagger-ui .topbar { display: none }',
+  customSiteTitle: 'Documentation API'
+}));
+
+app.get('/api-docs.json', (req, res) => {
+  res.setHeader('Content-Type', 'application/json');
+  res.send(swaggerSpec);
 });
 
 app.listen(PORT, async () => {
