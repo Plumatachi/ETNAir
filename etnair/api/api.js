@@ -1,6 +1,9 @@
 const express = require('express');
 require('dotenv').config();
 const prisma = require('./src/config/database');
+const authRoutes = require('./src/routes/auth');
+const userRoutes = require('./src/routes/user');
+const homeRoutes = require('./src/routes/home');
 
 console.log('🚀 Démarrage de l\'api...');
 console.log('📦 Variables d\'environnement chargées');
@@ -15,8 +18,9 @@ app.use((req, res, next) => {
   next();
 });
 
-const authRoutes = require('./src/routes/auth');
 app.use('/api/auth', authRoutes);
+app.use('/api/', userRoutes);
+app.use('/api/', homeRoutes);
 
 app.use((req, res) => {
   console.log(`⚠️ Route 404: ${req.method} ${req.path}`);
