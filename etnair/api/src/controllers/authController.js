@@ -1,15 +1,21 @@
 const userService = require('../services/userService');
 const { generateToken } = require('../utils/jwt');
+const { validationResult } = require('express-validator');
 
 const register = async (req, res) => {
     try {
-        const { email, password, username, usertype = 'LOCATOR' } = req.body;
-
-        if (!email || !password || !username) {
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
             return res.status(400).json({
-                error: 'Email, mot de passe et nom d\'utilisateur requis'
+                error: 'Données invalides',
+                details: errors.array().map(err => ({
+                    champ: err.path,
+                    message: err.msg
+                }))
             });
         }
+
+        const { email, password, username, usertype = 'LOCATOR' } = req.body;
 
         const emailExists = await userService.emailExists(email);
         if (emailExists) {
@@ -43,13 +49,18 @@ const register = async (req, res) => {
 
 const login = async (req, res) => {
     try {
-        const { email, password } = req.body;
-
-        if (!email || !password) {
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
             return res.status(400).json({
-                error: 'Email et mot de passe requis'
+                error: 'Données invalides',
+                details: errors.array().map(err => ({
+                    champ: err.path,
+                    message: err.msg
+                }))
             });
         }
+
+        const { email, password } = req.body;
 
         const user = await userService.findByEmail(email);
         if (!user) {
