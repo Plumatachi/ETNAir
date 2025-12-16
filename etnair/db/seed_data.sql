@@ -1,9 +1,9 @@
 INSERT INTO "user" (idUser, username, email, password, userType)
 VALUES
 ('570fdc7e-1b5c-4d15-8fa1-5633b78bd053', 'Cassandra', 'cassandra@etna.com', 'hello123', 'OWNER'),
-('dc986b12-e084-4bb0-88a9-0ba0070af9ec', 'Yoann', 'yoann@etna.com', 'hello123', 'CLIENT'),
-('f54016fa-7eb8-48a9-a64e-421f1cef03e1', 'Erwan', 'erwan@etna.com', 'hello123', 'CLIENT'),
-('f9f6c1ac-d1a2-4eef-9d00-3c7ff4cbb7d6', 'Zineb', 'zineb@etna.com', 'hello123', 'CLIENT'),
+('dc986b12-e084-4bb0-88a9-0ba0070af9ec', 'Yoann', 'yoann@etna.com', 'hello123', 'LOCATOR'),
+('f54016fa-7eb8-48a9-a64e-421f1cef03e1', 'Erwan', 'erwan@etna.com', 'hello123', 'LOCATOR'),
+('f9f6c1ac-d1a2-4eef-9d00-3c7ff4cbb7d6', 'Zineb', 'zineb@etna.com', 'hello123', 'LOCATOR'),
 ('1c0a393e-735b-4c80-9c87-1fd1a8f0fa76', 'Margaux', 'margaux@etna.com', 'hello123', 'OWNER'),
 ('c0554a34-e66a-4aa3-afd7-4f2448d39b56', 'Godric Gryffindor', 'gg@etna.com', 'hello123', 'OWNER'),
 ('b16a59bb-3e3f-4bd9-ba18-2afcb75092a1', 'Salazar Slytherin', 'ss@etna.com', 'hello123', 'OWNER'),
