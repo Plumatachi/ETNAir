@@ -27,7 +27,8 @@ const register = async (req, res) => {
 
         const token = generateToken({
             id: user.iduser,
-            email: user.email
+            email: user.email,
+            role: user.usertype,
         });
 
         res.status(201).json({
@@ -70,7 +71,8 @@ const login = async (req, res) => {
 
         const token = generateToken({
             id: user.iduser,
-            email: user.email
+            email: user.email,
+            role: user.usertype
         });
 
         res.json({

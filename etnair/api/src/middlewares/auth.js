@@ -17,6 +17,7 @@ const authenticate = (req, res, next) => {
         req.user = {
             id: decoded.id,
             email: decoded.email,
+            role: decoded.role,
         };
 
         next();
@@ -52,4 +53,18 @@ const optionalAuthenticate = (req, res, next) => {
     }
 };
 
-module.exports = { authenticate, optionalAuthenticate };
+const requireRole = (allowedRoles) => {
+    return (req, res, next) => {
+        if (!req.user) {
+            return res.status(401).json({ error: 'Non authentifié' });
+        }
+
+        if (!allowedRoles.includes(req.user.role)) {
+            return res.status(403).json({ error: 'Accès refusé' });
+        }
+
+        next();
+    };
+};
+
+module.exports = { authenticate, optionalAuthenticate, requireRole };

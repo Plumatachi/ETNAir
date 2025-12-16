@@ -70,7 +70,7 @@ const editHome = async (req, res) => {
         if (!home) {
             return res.status(404).json({ error: 'Logement non trouvé' });
         }
-        if (home.iduser !== iduser) {
+        if (req.user.role === 'OWNER' && home.iduser !== iduser) {
             return res.status(403).json({ error: 'Non autorisé' });
         }
 
@@ -91,7 +91,7 @@ const deleteHome = async (req, res) => {
         if (!home) {
             return res.status(404).json({ error: 'Logement non trouvé' });
         }
-        if (home.iduser !== iduser) {
+        if (req.user.role === 'OWNER' && home.iduser !== iduser) {
             return res.status(403).json({ error: 'Non autorisé' });
         }
 
