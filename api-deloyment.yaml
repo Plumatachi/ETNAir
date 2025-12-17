@@ -1,0 +1,37 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: etnair-api
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: etnair-api
+  template:
+    metadata:
+      labels:
+        app: etnair-api
+    spec:
+      containers:
+        - name: etnair-api
+          image: dio/api-etnair:latest
+          env:
+            - name: DB_HOST
+              value: postgresql
+            - name: DB_USER
+              valueFrom:
+                secretKeyRef:
+                  name: api-db-secret
+                  key: DB_USER
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: api-db-secret
+                  key: DB_PASSWORD
+            - name: DB_NAME
+              valueFrom:
+                secretKeyRef:
+                  name: api-db-secret
+                  key: DB_NAME
+          ports:
+            - containerPort: 3000
