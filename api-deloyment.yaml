@@ -17,13 +17,21 @@ spec:
           image: dio/api-etnair:latest
           env:
             - name: DB_HOST
-              value: "postgresql"
+              value: postgresql
             - name: DB_USER
-              value: "etnair_user"
+              valueFrom:
+                secretKeyRef:
+                  name: api-db-secret
+                  key: DB_USER
             - name: DB_PASSWORD
-              value: "etnair_pass"
+              valueFrom:
+                secretKeyRef:
+                  name: api-db-secret
+                  key: DB_PASSWORD
             - name: DB_NAME
-              value: "etnair_db"
+              valueFrom:
+                secretKeyRef:
+                  name: api-db-secret
+                  key: DB_NAME
           ports:
             - containerPort: 3000
-
