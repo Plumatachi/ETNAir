@@ -1,0 +1,7 @@
+stages:
+  - test
+
+hello_job:
+  stage: test
+  script:
+    - echo "Hello, GitLab Runner is working!"
