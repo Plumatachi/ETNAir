@@ -1,7 +1,9 @@
 const { S3Client, PutObjectCommand, GetObjectCommand, DeleteObjectCommand, ListObjectsV2Command, DeleteObjectsCommand } = require('@aws-sdk/client-s3');
 const { getSignedUrl } = require('@aws-sdk/s3-request-presigner');
-const { v4: uuidv4 } = require('uuid');
+const crypto = require('crypto');
 const sharp = require('sharp');
+
+const uuidv4 = () => crypto.randomUUID();
 
 class S3Service {
     constructor() {
