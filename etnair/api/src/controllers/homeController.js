@@ -12,12 +12,28 @@ const createHome = async (req, res) => {
 
         const iduser = req.user.id;
 
-        const home = await homeService.create({
-            namehome,
-            description, 
-            price, 
-            iduser
-        });
+        const files = req.files ? req.files.map(f => ({
+            buffer: f.buffer,
+            originalName: f.originalname,
+            mimeType: f.mimetype
+        })) : [];
+
+        let home;
+        if (files.length > 0) {
+            home = await homeService.createWithImages({
+                namehome,
+                description,
+                price,
+                iduser
+            }, files);
+        } else {
+            home = await homeService.create({
+                namehome,
+                description,
+                price,
+                iduser
+            });
+        }
 
         res.status(201).json({
             message: 'Enregistrement du logement réussi',
@@ -80,7 +96,7 @@ const editHome = async (req, res) => {
         console.error('Erreur lors de la modification du logement:', error);
         res.status(500).json({ error: 'Erreur serveur' });
     }
-}
+};
 
 const deleteHome = async (req, res) => {
     try {
@@ -103,10 +119,97 @@ const deleteHome = async (req, res) => {
     }
 };
 
+const addHomeImages = async (req, res) => {
+    try {
+        const id = req.params.id;
+        const iduser = req.user.id;
+
+        const home = await homeService.findById(id);
+        if (!home) {
+            return res.status(404).json({ error: 'Logement non trouvé' });
+        }
+        if (req.user.role === 'OWNER' && home.iduser !== iduser) {
+            return res.status(403).json({ error: 'Non autorisé' });
+        }
+
+        if (!req.files || req.files.length === 0) {
+            return res.status(400).json({ error: 'Aucune image fournie' });
+        }
+
+        const files = req.files.map(f => ({
+            buffer: f.buffer,
+            originalName: f.originalname,
+            mimeType: f.mimetype
+        }));
+
+        const updatedHome = await homeService.addImages(id, files);
+        res.json({
+            message: 'Images ajoutées avec succès',
+            home: updatedHome
+        });
+    } catch (error) {
+        console.error('Erreur lors de l\'ajout des images:', error);
+        res.status(500).json({ error: 'Erreur serveur' });
+    }
+};
+
+const deleteHomeImage = async (req, res) => {
+    try {
+        const { id, idimage } = req.params;
+        const iduser = req.user.id;
+
+        const home = await homeService.findById(id);
+        if (!home) {
+            return res.status(404).json({ error: 'Logement non trouvé' });
+        }
+        if (req.user.role === 'OWNER' && home.iduser !== iduser) {
+            return res.status(403).json({ error: 'Non autorisé' });
+        }
+
+        await homeService.deleteImage(idimage);
+        res.json({ message: 'Image supprimée avec succès' });
+    } catch (error) {
+        console.error('Erreur lors de la suppression de l\'image:', error);
+        res.status(500).json({ error: 'Erreur serveur' });
+    }
+};
+
+const reorderHomeImages = async (req, res) => {
+    try {
+        const id = req.params.id;
+        const iduser = req.user.id;
+        const { imageOrders } = req.body; // [{ idimage, ordernum }, ...]
+
+        const home = await homeService.findById(id);
+        if (!home) {
+            return res.status(404).json({ error: 'Logement non trouvé' });
+        }
+        if (req.user.role === 'OWNER' && home.iduser !== iduser) {
+            return res.status(403).json({ error: 'Non autorisé' });
+        }
+
+        if (!imageOrders || !Array.isArray(imageOrders)) {
+            return res.status(400).json({ error: 'Format de données invalide' });
+        }
+
+        const updatedHome = await homeService.reorderImages(id, imageOrders);
+        res.json({
+            message: 'Ordre des images mis à jour',
+            home: updatedHome
+        });
+    } catch (error) {
+        console.error('Erreur lors de la réorganisation des images:', error);
+        res.status(500).json({ error: 'Erreur serveur' });
+    }
+};
+
 module.exports = {
-    createHome, 
-    getAllHomes, 
-    getHome, 
-    editHome, 
-    deleteHome
+    createHome,
+    getAllHomes,
+    getHome,
+    editHome,
+    deleteHome,
+    addHomeImages,
+    deleteHomeImage,
+    reorderHomeImages
 };

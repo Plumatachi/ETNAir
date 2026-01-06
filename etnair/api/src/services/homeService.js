@@ -1,69 +1,195 @@
 const prisma = require('../config/database');
+const s3Service = require('./s3Service');
 const crypto = require('crypto');
 
+const uuidv4 = () => crypto.randomUUID();
+
 class HomeService {
-    async create({ namehome, description, price, iduser }) {
-        return prisma.home.create({
-            data : {
-                idhome: crypto.randomUUID(),
-                namehome, 
-                description, 
-                price, 
-                iduser,
+    async create(data) {
+        const idhome = uuidv4();
+
+        const home = await prisma.home.create({
+            data: {
+                idhome,
+                namehome: data.namehome,
+                description: data.description,
+                price: parseInt(data.price),
+                iduser: data.iduser,
             },
-            select: {
-                idhome: true, 
-                namehome: true, 
-                description: true,
-                price: true, 
-                iduser: true,
-            },
+            include: {
+                user: {
+                    select: {
+                        iduser: true,
+                        username: true,
+                        email: true,
+                    }
+                },
+                home_image: {
+                    orderBy: { ordernum: 'asc' }
+                }
+            }
         });
+
+        return home;
+    }
+
+    async createWithImages(homeData, files) {
+        const idhome = uuidv4();
+
+        const home = await prisma.home.create({
+            data: {
+                idhome,
+                namehome: homeData.namehome,
+                description: homeData.description,
+                price: parseInt(homeData.price),
+                iduser: homeData.iduser,
+            }
+        });
+
+        if (files && files.length > 0) {
+            const uploadedImages = await s3Service.uploadMultipleHomeImages(idhome, files);
+
+            const imageRecords = uploadedImages.map(img => ({
+                idimage: img.idimage,
+                idhome: idhome,
+                imageurl: img.imageurl,
+                imagekey: img.imagekey,
+                ordernum: img.ordernum,
+            }));
+
+            await prisma.homeImage.createMany({
+                data: imageRecords
+            });
+        }
+
+        return await this.findById(idhome);
     }
 
     async findAll() {
-        return prisma.home.findMany({
-            select: {
-                idhome: true, 
-                namehome: true, 
-                description: true, 
-                price: true, 
-                iduser: true,
+        return await prisma.home.findMany({
+            include: {
+                user: {
+                    select: {
+                        iduser: true,
+                        username: true,
+                        email: true,
+                    }
+                },
+                home_image: {
+                    orderBy: { ordernum: 'asc' }
+                }
             },
+            orderBy: {
+                namehome: 'asc'
+            }
         });
     }
 
-    async findById(id) {
-        return prisma.home.findUnique({
-            where: { idhome: id },
-            select: {
-                idhome: true, 
-                namehome: true,
-                description: true, 
-                price: true, 
-                iduser: true,
-            },
+    async findById(idhome) {
+        return await prisma.home.findUnique({
+            where: { idhome },
+            include: {
+                user: {
+                    select: {
+                        iduser: true,
+                        username: true,
+                        email: true,
+                    }
+                },
+                home_image: {
+                    orderBy: { ordernum: 'asc' }
+                }
+            }
         });
     }
 
-    async update(id, data) {
-        return prisma.home.update({
-            where: { idhome: id }, 
-            data, 
-            select: {
-                idhome: true, 
-                namehome: true,
-                description: true, 
-                price: true, 
-                iduser: true,
+    async update(idhome, data) {
+        return await prisma.home.update({
+            where: { idhome },
+            data: {
+                ...(data.namehome && { namehome: data.namehome }),
+                ...(data.description && { description: data.description }),
+                ...(data.price && { price: parseInt(data.price) }),
             },
+            include: {
+                user: {
+                    select: {
+                        iduser: true,
+                        username: true,
+                        email: true,
+                    }
+                },
+                home_image: {
+                    orderBy: { ordernum: 'asc' }
+                }
+            }
         });
     }
 
-    async delete(id) {
-        return prisma.home.delete({
-            where: { idhome: id },
+    async delete(idhome) {
+        await s3Service.deleteAllHomeImages(idhome);
+
+        return await prisma.home.delete({
+            where: { idhome }
         });
+    }
+
+    async addImages(idhome, files) {
+        const home = await this.findById(idhome);
+        if (!home) {
+            throw new Error('Logement non trouvé');
+        }
+
+        const maxOrder = home.home_image.length > 0
+            ? Math.max(...home.home_image.map(img => img.ordernum))
+            : -1;
+
+        const uploadedImages = await s3Service.uploadMultipleHomeImages(idhome, files);
+
+        const imageRecords = uploadedImages.map((img, index) => ({
+            idimage: img.idimage,
+            idhome: idhome,
+            imageurl: img.imageurl,
+            imagekey: img.imagekey,
+            ordernum: maxOrder + 1 + index,
+        }));
+
+        await prisma.homeImage.createMany({
+            data: imageRecords
+        });
+
+        return await this.findById(idhome);
+    }
+
+    async deleteImage(idimage) {
+        const image = await prisma.homeImage.findUnique({
+            where: { idimage }
+        });
+
+        if (!image) {
+            throw new Error('Image non trouvée');
+        }
+
+        await s3Service.deleteHomeImage(image.imagekey);
+
+        await prisma.homeImage.delete({
+            where: { idimage }
+        });
+
+        return true;
+    }
+
+    async reorderImages(idhome, imageOrders) {
+        // imageOrders est un tableau du type: [{ idimage: 'uuid', ordernum: 0 }, ...]
+        const updatePromises = imageOrders.map(({ idimage, ordernum }) =>
+            prisma.homeImage.update({
+                where: { idimage },
+                data: { ordernum }
+            })
+        );
+
+        await Promise.all(updatePromises);
+        return await this.findById(idhome);
     }
 }
 
