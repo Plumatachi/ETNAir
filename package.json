@@ -1,0 +1,7 @@
+{
+  "dependencies": {
+    "axios": "^1.13.2",
+    "tailwindcss": "^4.1.18",
+    "vue-router": "^4.6.4"
+  }
+}
