@@ -21,19 +21,29 @@ model User {
 }
 
 model Home {
-  idhome        String          @id @db.Uuid
-  namehome      String          @db.VarChar(100)
-  description   String
-  price         Int
+  idhome      String @id @db.Uuid
+  namehome    String @db.VarChar(100)
+  description String
+  price       Int
+
+  address    String @db.VarChar(255)
+  city       String @db.VarChar(100)
+  postalcode String @db.VarChar(10)
+  country    String @db.VarChar(100)
+
   iduser        String          @db.Uuid
   booking       Booking[]
   disponibility Disponibility[]
   user          User            @relation(fields: [iduser], references: [iduser], onDelete: Cascade, onUpdate: NoAction, map: "fk_home_user")
   home_image    HomeImage[]
+  propertyType  PropertyType    @map("property_type")
 
   @@index([price], map: "idx_home_price")
   @@index([iduser], map: "idx_home_iduser")
   @@index([namehome], map: "idx_home_namehome")
+  @@index([city], map: "idx_home_city")
+  @@index([postalcode], map: "idx_home_postalcode")
+  @@index([propertyType], map: "idx_home_propertytype")
   @@map("home")
 }
 
@@ -78,4 +88,16 @@ enum UserType {
   LOCATOR
   OWNER
   ADMIN
+}
+
+enum PropertyType {
+  APARTMENT
+  HOUSE
+  STUDIO
+  VILLA
+  COTTAGE
+  LOFT
+  CHALET
+
+  @@map("property_type")
 }

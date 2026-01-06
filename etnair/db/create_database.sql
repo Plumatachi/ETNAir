@@ -8,13 +8,34 @@ CREATE TABLE "user" (
 
 CREATE INDEX idx_user_username ON "user"(username);
 
+CREATE TYPE usertype AS ENUM (
+    'LOCATOR',
+    'OWNER',
+    'ADMIN'
+);
+
 -------------------------------------------------------
+
+CREATE TYPE property_type AS ENUM (
+    'APARTMENT',
+    'HOUSE',
+    'STUDIO',
+    'VILLA',
+    'COTTAGE',
+    'LOFT',
+    'CHALET'
+);
 
 CREATE TABLE "home" (
     idhome UUID PRIMARY KEY,
     namehome VARCHAR(100) NOT NULL,
     description TEXT NOT NULL,
     price INT NOT NULL,
+    address VARCHAR(255) NOT NULL,
+    city VARCHAR(100) NOT NULL,
+    postalcode VARCHAR(10) NOT NULL,
+    country VARCHAR(100) NOT NULL,
+    property_type property_type NOT NULL,
     iduser UUID NOT NULL,
 
     CONSTRAINT fk_home_user
@@ -23,9 +44,12 @@ CREATE TABLE "home" (
             ON DELETE CASCADE
 );
 
-CREATE INDEX idx_home_nameHome ON "home"(namehome);
+CREATE INDEX idx_home_namehome ON "home"(namehome);
 CREATE INDEX idx_home_price ON "home"(price);
-CREATE INDEX idx_home_idUser ON "home"(iduser);
+CREATE INDEX idx_home_iduser ON "home"(iduser);
+CREATE INDEX idx_home_city ON "home"(city);
+CREATE INDEX idx_home_postalcode ON "home"(postalcode);
+CREATE INDEX idx_home_propertytype ON "home"(property_type);
 
 -------------------------------------------------------
 
