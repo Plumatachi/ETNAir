@@ -36,14 +36,14 @@ model Home {
   disponibility Disponibility[]
   user          User            @relation(fields: [iduser], references: [iduser], onDelete: Cascade, onUpdate: NoAction, map: "fk_home_user")
   home_image    HomeImage[]
-  propertyType  PropertyType    @map("property_type")
+  propertytype  PropertyType    @map("property_type")
 
   @@index([price], map: "idx_home_price")
   @@index([iduser], map: "idx_home_iduser")
   @@index([namehome], map: "idx_home_namehome")
   @@index([city], map: "idx_home_city")
   @@index([postalcode], map: "idx_home_postalcode")
-  @@index([propertyType], map: "idx_home_propertytype")
+  @@index([propertytype], map: "idx_home_propertytype")
   @@map("home")
 }
 
