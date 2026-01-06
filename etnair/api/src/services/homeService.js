@@ -14,6 +14,11 @@ class HomeService {
                 namehome: data.namehome,
                 description: data.description,
                 price: parseInt(data.price),
+                address: data.address,
+                city: data.city,
+                postalcode: data.postalcode,
+                country: data.country,
+                propertytype: data.propertytype,
                 iduser: data.iduser,
             },
             include: {
@@ -42,6 +47,11 @@ class HomeService {
                 namehome: homeData.namehome,
                 description: homeData.description,
                 price: parseInt(homeData.price),
+                address: homeData.address,
+                city: homeData.city,
+                postalcode: homeData.postalcode,
+                country: homeData.country,
+                propertytype: homeData.propertytype,
                 iduser: homeData.iduser,
             }
         });
@@ -104,13 +114,25 @@ class HomeService {
     }
 
     async update(idhome, data) {
+        const updateData = {
+            ...(data.namehome && { namehome: data.namehome }),
+            ...(data.description && { description: data.description }),
+            ...(data.price && { price: parseInt(data.price) }),
+            ...(data.address && { address: data.address }),
+            ...(data.city && { city: data.city }),
+            ...(data.postalcode && { postalcode: data.postalcode }),
+            ...(data.country && { country: data.country }),
+        };
+
+        if (data.propertyType) {
+            updateData.propertytype = data.propertyType;
+        } else if (data.propertytype) {
+            updateData.propertytype = data.propertytype;
+        }
+
         return await prisma.home.update({
             where: { idhome },
-            data: {
-                ...(data.namehome && { namehome: data.namehome }),
-                ...(data.description && { description: data.description }),
-                ...(data.price && { price: parseInt(data.price) }),
-            },
+            data: updateData,
             include: {
                 user: {
                     select: {

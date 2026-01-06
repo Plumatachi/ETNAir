@@ -2,11 +2,11 @@ const homeService = require('../services/homeService');
 
 const createHome = async (req, res) => {
     try {
-        const { namehome, description, price } = req.body;
+        const { namehome, description, price, address, city, postalcode, country, propertyType } = req.body;
 
-        if (!namehome || !description || !price) {
+        if (!namehome || !description || !price || !address || !city || !postalcode || !country || !propertyType) {
             return res.status(400).json({
-                error: 'Nom du logement, description et prix requis'
+                error: 'Nom du logement, description, prix, adresse, ville, code postal, pays et type de propriété requis'
             });
         }
 
@@ -24,6 +24,11 @@ const createHome = async (req, res) => {
                 namehome,
                 description,
                 price,
+                address,
+                city,
+                postalcode,
+                country,
+                propertytype: propertyType,
                 iduser
             }, files);
         } else {
@@ -31,6 +36,11 @@ const createHome = async (req, res) => {
                 namehome,
                 description,
                 price,
+                address,
+                city,
+                postalcode,
+                country,
+                propertytype: propertyType,
                 iduser
             });
         }
