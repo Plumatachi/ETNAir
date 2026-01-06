@@ -12,10 +12,10 @@
       </div>
 
       <div v-else class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <AnnouncementCard
-            v-for="announcement in announcements"
-            :key="announcement.id"
-            :announcement="announcement"
+        <HomeCard
+            v-for="home in homes"
+            :key="home.id"
+            :home="home"
         />
       </div>
     </div>
@@ -24,17 +24,17 @@
 
 <script setup>
 import { ref, onMounted } from 'vue'
-import AnnouncementCard from './HomeCard.vue'
+import HomeCard from './HomeCard.vue'
 import api from '@/services/api'
 
-const announcements = ref([])
+const homes = ref([])
 const loading = ref(true)
 const error = ref(null)
 
 onMounted(async () => {
   try {
     const response = await api.getHomes()
-    announcements.value = response.data
+    homes.value = response.data
   } catch (err) {
     error.value = 'Impossible de charger les annonces'
     console.error(err)

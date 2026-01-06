@@ -2,9 +2,7 @@
   <header class="bg-primary text-white shadow-md">
     <nav class="container mx-auto px-4 py-4 flex justify-between items-center">
       <RouterLink to="/" class="flex items-center space-x-2">
-        <svg class="w-8 h-8" viewBox="0 0 24 24" fill="currentColor">
-          <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/>
-        </svg>
+        <img src="@/assets/logo.png" alt="Logo" class="w-16 h-16">
         <span class="text-2xl font-bold">ETNAir</span>
       </RouterLink>
 

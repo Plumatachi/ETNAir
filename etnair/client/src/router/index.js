@@ -8,31 +8,6 @@ const router = createRouter({
             path: '/',
             name: 'home',
             component: HomeView
-        },
-        {
-            path: '/recherche',
-            name: 'search',
-            component: () => import('@/views/SearchView.vue')
-        },
-        {
-            path: '/a-propos',
-            name: 'about',
-            component: () => import('@/views/AboutView.vue')
-        },
-        {
-            path: '/contact',
-            name: 'contact',
-            component: () => import('@/views/ContactView.vue')
-        },
-        {
-            path: '/connexion',
-            name: 'login',
-            component: () => import('@/views/LoginView.vue')
-        },
-        {
-            path: '/inscription',
-            name: 'register',
-            component: () => import('@/views/RegisterView.vue')
         }
     ],
     scrollBehavior(to, from, savedPosition) {

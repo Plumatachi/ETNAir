@@ -1,17 +1,17 @@
 <template>
   <div id="app">
-    <Header />
+    <HeaderComponent />
     <main>
       <RouterView />
     </main>
-    <Footer />
+    <FooterComponent />
   </div>
 </template>
 
 <script setup>
 import { RouterView } from 'vue-router'
-import Header from '@/components/layout/Header.vue'
-import Footer from '@/components/layout/Footer.vue'
+import HeaderComponent from '@/components/layout/HeaderComponent.vue'
+import FooterComponent from '@/components/layout/FooterComponent.vue'
 </script>
 
 <style scoped>
