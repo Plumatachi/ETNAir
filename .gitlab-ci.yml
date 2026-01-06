@@ -1,7 +1,11 @@
+image: alpine:latest
+
 stages:
   - test
 
 hello_job:
   stage: test
   script:
-    - echo "Hello, GitLab Runner is working!"
+    - echo "CI/CD fonctionne sur GitLab ETNA"
+    - uname -a
+    - whoami
