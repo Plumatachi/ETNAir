@@ -1,4 +1,5 @@
 import React from 'react';
+import Link from "next/link";
 
 export default function FirstSection() {
     return (
@@ -19,9 +20,12 @@ export default function FirstSection() {
                         Appartements, maisons et expériences sélectionnées avec soin
                     </p>
                 </div>
-                <button className="bg-[#DA504E] text-white px-8 py-3 font-medium rounded hover:bg-[#c44543] transition">
-                    Trouver un bien à louer
-                </button>
+                <Link href="/search">
+                    <button className="bg-[#DA504E] text-white px-8 py-3 font-medium rounded hover:bg-[#c44543] transition">
+                        Trouver un bien à louer
+                    </button>
+                </Link>
+
             </div>
         </div>
     );
