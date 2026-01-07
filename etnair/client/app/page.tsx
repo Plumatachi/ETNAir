@@ -3,6 +3,7 @@ import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import FirstSection from "@/components/homePage/FirstSection";
 import HomesList from "@/components/home/HomesList";
+import ThirdSection from "@/components/homePage/ThirdSection";
 
 export default function HomePage() {
   return (
@@ -12,6 +13,7 @@ export default function HomePage() {
         <main className="grow">
             <FirstSection />
             <HomesList />
+            <ThirdSection />
         </main>
 
         <Footer />

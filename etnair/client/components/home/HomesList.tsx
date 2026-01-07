@@ -56,7 +56,7 @@ export default function HomesList() {
     }
 
     return (
-        <div className="py-12 bg-gray-50">
+        <div className="py-12 bg-white">
             <div className="container mx-auto px-4">
                 <h2 className="text-3xl font-bold text-[#153563] text-center mb-8">
                     Nouvelles annonces
