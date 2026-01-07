@@ -1,0 +1,5 @@
+- name: Appliquer secrets MinIO
+  kubernetes.core.k8s:
+    state: present
+    src: minio-secret.yaml
+
