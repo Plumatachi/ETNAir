@@ -1,4 +1,5 @@
 const express = require('express');
+const cors = require('cors');
 require('dotenv').config();
 const prisma = require('./src/config/database');
 const authRoutes = require('./src/routes/auth');
@@ -15,6 +16,10 @@ const PORT = process.env.PORT || 3000;
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(cors({
+  origin: process.env.NEXT_URL,
+  credentials: true
+}));
 
 app.use((req, res, next) => {
   next();
