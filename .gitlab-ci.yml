@@ -1,0 +1,9 @@
+stages:
+  - test
+
+hello-job:
+  stage: test
+  script:
+    - echo "Hello, GitLab CI/CD!"
+  tags:
+    - k3s
