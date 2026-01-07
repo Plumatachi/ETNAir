@@ -1,34 +1,4 @@
-stages:
-  - build
-  - test
-  - deploy
-
-# Job de build
-build-job:
-  stage: build
-  script:
-    - echo "Compilation / Build en cours..."
-  tags:
-    - k3s
-    - projet-cyber
-
-# Job de test
-test-job:
+hello-job:
   stage: test
   script:
-    - echo "Tests en cours..."
-    - sleep 5
-  tags:
-    - k3s
-    - projet-cyber
-
-# Job de déploiement
-deploy-job:
-  stage: deploy
-  script:
-    - echo "Déploiement sur l'environnement de test..."
-  environment: staging
-  when: manual
-  tags:
-    - k3s
-    - projet-cyber
+    - echo "Hello, GitLab CI/CD!"
