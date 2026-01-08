@@ -72,6 +72,13 @@ const getHome = async (req, res) => {
     try {
         const id = req.params.id;
 
+        const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+        if (!uuidRegex.test(id)) {
+            return res.status(400).json({
+                error: 'ID invalide'
+            });
+        }
+
         const home = await homeService.findById(id);
         if (!home) {
             return res.status(404).json({
@@ -79,7 +86,7 @@ const getHome = async (req, res) => {
             });
         }
 
-        res.json({ home });
+        res.json(home);
     } catch (error) {
         console.error('Erreur lors de la récupération du domicile:', error);
         res.status(500).json({ error: 'Erreur serveur' });

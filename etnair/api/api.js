@@ -5,6 +5,7 @@ const prisma = require('./src/config/database');
 const authRoutes = require('./src/routes/auth');
 const userRoutes = require('./src/routes/user');
 const homeRoutes = require('./src/routes/home');
+const bookingRoutes = require('./src/routes/booking');
 const swaggerUi = require('swagger-ui-express');
 const swaggerSpec = require('./src/swagger/swagger.config');
 
@@ -28,6 +29,7 @@ app.use((req, res, next) => {
 app.use('/api/auth', authRoutes);
 app.use('/api/user/', userRoutes);
 app.use('/api/', homeRoutes);
+app.use('/api/bookings/', bookingRoutes);
 app.use('/api-docs', swaggerUi.serve);
 app.get('/api-docs', swaggerUi.setup(swaggerSpec, {
   explorer: true,
