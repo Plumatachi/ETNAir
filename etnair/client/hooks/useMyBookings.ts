@@ -13,6 +13,12 @@ export function useMyBookings(autoFetch: boolean = true) {
             setLoading(true);
             setError(null);
 
+            const token = localStorage.getItem('token');
+
+            if (!token) {
+                throw new Error('Vous devez être connecté pour voir vos réservations');
+            }
+
             const params = new URLSearchParams();
             if (filters?.upcoming) params.append('upcoming', 'true');
             if (filters?.past) params.append('past', 'true');
@@ -24,6 +30,7 @@ export function useMyBookings(autoFetch: boolean = true) {
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`, // ← AJOUT : Envoyer le token
                 },
             });
 

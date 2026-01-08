@@ -13,10 +13,17 @@ export function useBooking() {
             setLoading(true);
             setError(null);
 
+            const token = localStorage.getItem('token');
+
+            if (!token) {
+                throw new Error('Vous devez être connecté pour effectuer une réservation');
+            }
+
             const response = await fetch('/api/bookings', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`,
                 },
                 body: JSON.stringify(data),
             });

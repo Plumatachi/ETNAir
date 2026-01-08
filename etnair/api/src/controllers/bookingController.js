@@ -4,7 +4,15 @@ class BookingController {
     async createBooking(req, res) {
         try {
             const { idhome, startdate, enddate } = req.body;
-            const iduser = req.user.iduser;
+
+            const iduser = req.user.id;
+
+            if (!iduser) {
+                return res.status(401).json({
+                    success: false,
+                    message: 'User ID not found in token'
+                });
+            }
 
             const booking = await bookingService.createBooking({
                 idhome,
@@ -71,7 +79,7 @@ class BookingController {
 
     async getMyBookings(req, res) {
         try {
-            const iduser = req.user.iduser;
+            const iduser = req.user.id;
             const { upcoming, past } = req.query;
 
             const filters = {
@@ -110,7 +118,7 @@ class BookingController {
         try {
             const { idbooking } = req.params;
             const { startdate, enddate } = req.body;
-            const iduser = req.user.iduser;
+            const iduser = req.user.id;
 
             const booking = await bookingService.updateBooking(
                 idbooking,
@@ -140,8 +148,8 @@ class BookingController {
     async deleteBooking(req, res) {
         try {
             const { idbooking } = req.params;
-            const iduser = req.user.iduser;
-            const isAdmin = req.user.usertype === 'ADMIN';
+            const iduser = req.user.id;
+            const isAdmin = req.user.role === 'ADMIN';
 
             await bookingService.deleteBooking(idbooking, iduser, isAdmin);
 
