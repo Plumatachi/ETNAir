@@ -44,6 +44,11 @@ export function getPropertyTypeLabel(type: PropertyType): string {
     return PROPERTY_TYPE_LABELS[type] || type;
 }
 
+export function getImageUrl(imageKey: string | null): string | null {
+    if (!imageKey) return null;
+    return `/api/images/${imageKey}`;
+}
+
 export function getFirstImageKey(home: Home): string | null {
     if (!home.home_image || home.home_image.length === 0) {
         return null;
