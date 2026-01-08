@@ -11,13 +11,23 @@ export default function Header() {
     const [showLogin, setShowLogin] = useState(false);
     const [showRegister, setShowRegister] = useState(false);
     const [isAuthenticated, setIsAuthenticated] = useState(false);
+    const [userRole, setUserRole] = useState<string | null>(null);
 
     useEffect(() => {
         try {
             const token = localStorage.getItem('token');
-            setIsAuthenticated(!!token);
+            if (token) {
+                setIsAuthenticated(true);
+
+                const payload = JSON.parse(atob(token.split('.')[1]));
+                setUserRole(payload.role || null);
+            } else {
+                setIsAuthenticated(false);
+                setUserRole(null);
+            }
         } catch (e) {
             setIsAuthenticated(false);
+            setUserRole(null);
         }
     }, []);
 
@@ -26,8 +36,11 @@ export default function Header() {
             localStorage.removeItem('token');
         } catch (e) {}
         setIsAuthenticated(false);
+        setUserRole(null);
         window.location.href = '/';
     };
+
+    const isOwner = userRole === 'OWNER' || userRole === 'ADMIN';
 
     return (
         <>
@@ -42,6 +55,27 @@ export default function Header() {
                     <nav className="flex items-center gap-4">
                         {isAuthenticated ? (
                             <div className="flex items-center gap-4">
+                                {isOwner && (
+                                    <button
+                                        onClick={() => router.push('/add-home')}
+                                        className="bg-white text-[#153563] px-6 py-2 rounded hover:bg-gray-100 transition flex items-center gap-2"
+                                    >
+                                        <svg
+                                            className="w-5 h-5"
+                                            fill="none"
+                                            stroke="currentColor"
+                                            viewBox="0 0 24 24"
+                                        >
+                                            <path
+                                                strokeLinecap="round"
+                                                strokeLinejoin="round"
+                                                strokeWidth={2}
+                                                d="M12 4v16m8-8H4"
+                                            />
+                                        </svg>
+                                        Ajouter un bien
+                                    </button>
+                                )}
                                 <button
                                     onClick={() => router.push('/my-bookings')}
                                     className="text-white hover:text-gray-200 transition flex items-center gap-2"
