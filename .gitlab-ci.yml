@@ -1,3 +1,6 @@
+stages:
+  - test
+
 hello-job:
   stage: test
   script:
