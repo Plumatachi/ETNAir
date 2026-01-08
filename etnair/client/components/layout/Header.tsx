@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from "next/link";
 import LoginModal from '../modals/LoginModal';
 import RegisterModal from '../modals/RegisterModal';
@@ -8,6 +8,24 @@ import RegisterModal from '../modals/RegisterModal';
 export default function Header() {
     const [showLogin, setShowLogin] = useState(false);
     const [showRegister, setShowRegister] = useState(false);
+    const [isAuthenticated, setIsAuthenticated] = useState(false);
+
+    useEffect(() => {
+        try {
+            const token = localStorage.getItem('token');
+            setIsAuthenticated(!!token);
+        } catch (e) {
+            setIsAuthenticated(false);
+        }
+    }, []);
+
+    const handleLogout = () => {
+        try {
+            localStorage.removeItem('token');
+        } catch (e) {}
+        setIsAuthenticated(false);
+        window.location.href = '/';
+    };
 
     return (
         <>
@@ -20,18 +38,28 @@ export default function Header() {
                     </div>
 
                     <nav className="flex items-center gap-4">
-                        <button
-                            onClick={() => setShowRegister(true)}
-                            className="text-white hover:text-gray-200 transition"
-                        >
-                            Inscription
-                        </button>
-                        <button
-                            onClick={() => setShowLogin(true)}
-                            className="bg-white text-[#153563] px-6 py-2 rounded hover:bg-gray-100 transition"
-                        >
-                            Connexion
-                        </button>
+                        {isAuthenticated ? (
+                            <div className="flex items-center gap-4">
+                                <button onClick={handleLogout} className="text-white px-6 py-2 rounded hover:bg-[#bb4644] transition">
+                                    Se déconnecter
+                                </button>
+                            </div>
+                        ) : (
+                            <>
+                                <button
+                                    onClick={() => setShowRegister(true)}
+                                    className="text-white hover:text-gray-200 transition"
+                                >
+                                    Inscription
+                                </button>
+                                <button
+                                    onClick={() => setShowLogin(true)}
+                                    className="bg-white text-[#153563] px-6 py-2 rounded hover:bg-gray-100 transition"
+                                >
+                                    Connexion
+                                </button>
+                            </>
+                        )}
                     </nav>
                 </div>
             </header>
