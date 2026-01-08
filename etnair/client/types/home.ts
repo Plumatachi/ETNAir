@@ -44,6 +44,14 @@ export function getPropertyTypeLabel(type: PropertyType): string {
     return PROPERTY_TYPE_LABELS[type] || type;
 }
 
+export function getImageUrl(imageKey: string | null): string | null {
+    console.log('🔍 getImageUrl appelée avec:', { imageKey, type: typeof imageKey });
+    if (!imageKey) return null;
+    const url = `/api/images/${imageKey}`;
+    console.log('🔗 URL construite:', url);
+    return url;
+}
+
 export function getFirstImageKey(home: Home): string | null {
     if (!home.home_image || home.home_image.length === 0) {
         return null;
