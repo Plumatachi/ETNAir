@@ -1,0 +1,19 @@
+import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
+import fs from "fs";
+
+const s3 = new S3Client({
+  endpoint: "http://minio:9000",
+  region: "us-east-1",
+  credentials: {
+    accessKeyId: "minioadmin",
+    secretAccessKey: "minioadmin123",
+  },
+  forcePathStyle: true,
+});
+
+await s3.send(new PutObjectCommand({
+  Bucket: "images",
+  Key: "photo.jpg",
+  Body: fs.createReadStream("photo.jpg"),
+}));
+
