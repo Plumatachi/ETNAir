@@ -15,28 +15,35 @@ stages:
 
 variables:
   NODE_ENV: test
+  NPM_CONFIG_CACHE: "$CI_PROJECT_DIR/.npm"
+
+cache:
+  paths:
+    - .npm/
+
+.default_node_job: &default_node_job
+  image: node:18
+  before_script:
+    - cd api
+    - npm ci
 
 test:
   stage: test
-  image: node:18
+  <<: *default_node_job
   script:
-    - cd api
-    - npm install
     - npm test
-  only:
-    - main
-    - merge_requests
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+    - if: '$CI_COMMIT_BRANCH == "main"'
 
 security:
   stage: security
-  image: node:18
+  <<: *default_node_job
   script:
-    - cd api
-    - npm install
     - npm audit --audit-level=high
-  only:
-    - main
-    - merge_requests
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+    - if: '$CI_COMMIT_BRANCH == "main"'
 
 deploy:
   stage: deploy
@@ -44,9 +51,17 @@ deploy:
     name: bitnami/kubectl:latest
     entrypoint: [""]
   script:
-    - echo "Déploiement de l'API sur kubernetes"
+    - echo "Déploiement de l'API sur Kubernetes"
+    - kubectl config use-context "$KUBE_CONTEXT"
     - kubectl apply -f k8s/secrets.yaml
+<<<<<<< HEAD
     - kubectl apply -f k8s/
   only:
     - main
 >>>>>>> 9f8034f ([#19] Configurer une pipeline CI/CD dans GitLab)
+=======
+    - kubectl apply -f k8s/deployment.yaml
+    - kubectl apply -f k8s/service.yaml
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "main"'
+>>>>>>> 2275b64 (Config ci/cd)
