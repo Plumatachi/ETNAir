@@ -47,10 +47,7 @@ deploy:
     - kubectl apply -f k8s/
   only:
     - main
->>>>>>> 9f8034f ([#19] Configurer une pipeline CI/CD dans GitLab)
-=======
     - kubectl apply -f k8s/deployment.yaml
     - kubectl apply -f k8s/service.yaml
   rules:
     - if: '$CI_COMMIT_BRANCH == "main"'
->>>>>>> 2275b64 (Config ci/cd)
