@@ -1,13 +1,3 @@
-<<<<<<< HEAD
-
-stages:
-  - test
-
-hello-job:
-  stage: test
-  script:
-    - echo "Hello, GitLab CI/CD!"
-=======
 stages:
   - test
   - security
@@ -54,7 +44,6 @@ deploy:
     - echo "Déploiement de l'API sur Kubernetes"
     - kubectl config use-context "$KUBE_CONTEXT"
     - kubectl apply -f k8s/secrets.yaml
-<<<<<<< HEAD
     - kubectl apply -f k8s/
   only:
     - main
