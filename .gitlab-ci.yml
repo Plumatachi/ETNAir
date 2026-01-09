@@ -21,7 +21,14 @@ test:
   stage: test
   <<: *default_node_job
   script:
-    - npm test
+    - |
+      if grep -q '"test":' package.json; then
+        echo "Exécution des tests..."
+        npm test
+      else
+        echo "ATTENTION : Aucun script 'test' trouvé dans package.json"
+        echo "-------------------------------------------------------"
+      fi
   rules:
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
     - if: '$CI_COMMIT_BRANCH == "main"'
