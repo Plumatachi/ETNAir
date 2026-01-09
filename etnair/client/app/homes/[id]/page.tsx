@@ -17,12 +17,58 @@ export default function HomeDetailPage() {
     const { home, loading, error } = useHome(homeId);
     const [currentImageIndex, setCurrentImageIndex] = useState(0);
     const [imageError, setImageError] = useState<Record<number, boolean>>({});
+    const [isAuthenticated, setIsAuthenticated] = useState(false);
+    const [userId, setUserId] = useState<string | null>(null);
+    const [userRole, setUserRole] = useState<string | null>(null);
+    const [showDeleteModal, setShowDeleteModal] = useState(false);
+    const [deleting, setDeleting] = useState(false);
 
-    // Reset l'index et les erreurs quand on change d'annonce
+    useEffect(() => {
+        try {
+            const token = localStorage.getItem('token');
+            if (token) {
+                setIsAuthenticated(true);
+                const payload = JSON.parse(atob(token.split('.')[1]));
+                setUserId(payload.id || null);
+                setUserRole(payload.role || null);
+            }
+        } catch (e) {
+            setIsAuthenticated(false);
+        }
+    }, []);
+
     useEffect(() => {
         setCurrentImageIndex(0);
         setImageError({});
     }, [homeId]);
+
+    const canEdit = isAuthenticated && home && (
+        userRole === 'ADMIN' || userId === home.iduser
+    );
+
+    const handleDelete = async () => {
+        try {
+            setDeleting(true);
+            const token = localStorage.getItem('token');
+
+            const response = await fetch(`/api/homes/${homeId}`, {
+                method: 'DELETE',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                },
+            });
+
+            if (!response.ok) {
+                throw new Error('Erreur lors de la suppression');
+            }
+
+            router.push('/');
+        } catch (err) {
+            alert(err instanceof Error ? err.message : 'Erreur lors de la suppression');
+            setDeleting(false);
+            setShowDeleteModal(false);
+        }
+    };
 
     if (loading) {
         return (
@@ -77,15 +123,40 @@ export default function HomeDetailPage() {
         <div className="min-h-screen bg-gray-50">
             <Header />
             <div className="container mx-auto px-4 py-8">
-                <button
-                    onClick={() => router.back()}
-                    className="flex items-center gap-2 text-gray-600 hover:text-[#153563] mb-6 transition"
-                >
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-                    </svg>
-                    Retour aux annonces
-                </button>
+                <div className="flex items-center justify-between mb-6">
+                    <button
+                        onClick={() => router.back()}
+                        className="flex items-center gap-2 text-gray-600 hover:text-[#153563] transition"
+                    >
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                        </svg>
+                        Retour aux annonces
+                    </button>
+
+                    {canEdit && (
+                        <div className="flex gap-3">
+                            <button
+                                onClick={() => router.push(`/homes/${homeId}/edit`)}
+                                className="flex items-center gap-2 px-4 py-2 bg-[#153563] text-white rounded-lg hover:bg-[#1a4575] transition"
+                            >
+                                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                </svg>
+                                Modifier
+                            </button>
+                            <button
+                                onClick={() => setShowDeleteModal(true)}
+                                className="flex items-center gap-2 px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition"
+                            >
+                                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                </svg>
+                                Supprimer
+                            </button>
+                        </div>
+                    )}
+                </div>
 
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                     {/* Colonne gauche - Image et détails */}
@@ -222,6 +293,37 @@ export default function HomeDetailPage() {
                     </div>
                 </div>
             </div>
+
+            {/* Modal de confirmation de suppression */}
+            {showDeleteModal && (
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                    <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4">
+                        <h3 className="text-xl font-bold text-[#153563] mb-4">
+                            Confirmer la suppression
+                        </h3>
+                        <p className="text-gray-700 mb-6">
+                            Êtes-vous sûr de vouloir supprimer cette annonce ? Cette action est irréversible.
+                        </p>
+                        <div className="flex gap-4">
+                            <button
+                                onClick={() => setShowDeleteModal(false)}
+                                disabled={deleting}
+                                className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition disabled:opacity-50"
+                            >
+                                Annuler
+                            </button>
+                            <button
+                                onClick={handleDelete}
+                                disabled={deleting}
+                                className="flex-1 px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition disabled:opacity-50"
+                            >
+                                {deleting ? 'Suppression...' : 'Supprimer'}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
             <Footer />
         </div>
     );
