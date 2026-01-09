@@ -45,9 +45,5 @@ deploy:
     - kubectl config use-context "$KUBE_CONTEXT"
     - kubectl apply -f k8s/secrets.yaml
     - kubectl apply -f k8s/
-  only:
-    - main
-    - kubectl apply -f k8s/deployment.yaml
-    - kubectl apply -f k8s/service.yaml
   rules:
     - if: '$CI_COMMIT_BRANCH == "main"'
