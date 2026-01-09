@@ -14,6 +14,11 @@ export default function EditHomePage() {
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
     const [error, setError] = useState<string | null>(null);
+    const [existingImages, setExistingImages] = useState<any[]>([]);
+    const [newImages, setNewImages] = useState<File[]>([]);
+    const [imagePreviews, setImagePreviews] = useState<string[]>([]);
+    const [uploadingImages, setUploadingImages] = useState(false);
+    const [deletingImageId, setDeletingImageId] = useState<string | null>(null);
 
     const [formData, setFormData] = useState<HomeFormData>({
         namehome: '',
@@ -66,6 +71,93 @@ export default function EditHomePage() {
             ...prev,
             [name]: name === 'price' ? parseFloat(value) || 0 : value
         }));
+    };
+
+    const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const files = Array.from(e.target.files || []);
+
+        if (files.length + existingImages.length + newImages.length > 10) {
+            setError('Vous ne pouvez avoir que 10 images maximum au total');
+            return;
+        }
+
+        setNewImages(prev => [...prev, ...files]);
+        const previews = files.map(file => URL.createObjectURL(file));
+        setImagePreviews(prev => [...prev, ...previews]);
+        setError(null);
+    };
+
+    const removeNewImage = (index: number) => {
+        setNewImages(prev => prev.filter((_, i) => i !== index));
+        setImagePreviews(prev => prev.filter((_, i) => i !== index));
+    };
+
+    const handleAddImages = async () => {
+        if (newImages.length === 0) return;
+
+        try {
+            setUploadingImages(true);
+            const token = localStorage.getItem('token');
+
+            const formData = new FormData();
+            newImages.forEach(image => {
+                formData.append('images', image);
+            });
+
+            const response = await fetch(`/api/homes/${id}/images`, {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                },
+                body: formData,
+            });
+
+            if (!response.ok) {
+                throw new Error('Erreur lors de l\'ajout des images');
+            }
+
+            const result = await response.json();
+
+            if (result.home?.home_image) {
+                setExistingImages(result.home.home_image.sort((a: any, b: any) => a.ordernum - b.ordernum));
+            }
+
+            setNewImages([]);
+            setImagePreviews([]);
+            setError(null);
+        } catch (err) {
+            setError(err instanceof Error ? err.message : 'Erreur lors de l\'ajout des images');
+        } finally {
+            setUploadingImages(false);
+        }
+    };
+
+    const handleDeleteImage = async (imageId: string) => {
+        try {
+            setDeletingImageId(imageId);
+            const token = localStorage.getItem('token');
+
+            const response = await fetch(`/api/homes/${id}/images/${imageId}`, {
+                method: 'DELETE',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                },
+            });
+
+            if (!response.ok) {
+                throw new Error('Erreur lors de la suppression de l\'image');
+            }
+
+            setExistingImages(prev => prev.filter(img => img.idimage !== imageId));
+        } catch (err) {
+            setError(err instanceof Error ? err.message : 'Erreur lors de la suppression');
+        } finally {
+            setDeletingImageId(null);
+        }
+    };
+
+    const getImageUrl = (imageKey: string) => {
+        return `${process.env.NEXT_PUBLIC_API_URL}/uploads/${imageKey}`;
     };
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -293,6 +385,118 @@ export default function EditHomePage() {
                                     onChange={handleInputChange}
                                     className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#153563] focus:border-transparent text-[#153563]"
                                 />
+                            </div>
+
+                            {/* Gestion des images */}
+                            <div className="border-t pt-6 mt-6">
+                                <h2 className="text-xl font-semibold text-[#153563] mb-4">
+                                    Gestion des images
+                                </h2>
+
+                                {/* Images existantes */}
+                                {existingImages.length > 0 && (
+                                    <div className="mb-6">
+                                        <h3 className="text-sm font-medium text-gray-700 mb-3">
+                                            Images actuelles ({existingImages.length}/10)
+                                        </h3>
+                                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                                            {existingImages.map((image, index) => (
+                                                <div key={image.idimage} className="relative group">
+                                                    <img
+                                                        src={getImageUrl(image.imagekey)}
+                                                        alt={`Image ${index + 1}`}
+                                                        className="w-full h-32 object-cover rounded-lg"
+                                                    />
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => handleDeleteImage(image.idimage)}
+                                                        disabled={deletingImageId === image.idimage}
+                                                        className="absolute top-2 right-2 bg-red-500 text-white p-1.5 rounded-full opacity-0 group-hover:opacity-100 transition disabled:opacity-50"
+                                                    >
+                                                        {deletingImageId === image.idimage ? (
+                                                            <svg className="w-4 h-4 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                                                            </svg>
+                                                        ) : (
+                                                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                                                            </svg>
+                                                        )}
+                                                    </button>
+                                                    {index === 0 && (
+                                                        <div className="absolute bottom-2 left-2 bg-[#153563] text-white text-xs px-2 py-1 rounded">
+                                                            Image principale
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+                                )}
+
+                                {/* Ajouter de nouvelles images */}
+                                {existingImages.length < 10 && (
+                                    <div>
+                                        <h3 className="text-sm font-medium text-gray-700 mb-2">
+                                            Ajouter des images
+                                        </h3>
+                                        <input
+                                            type="file"
+                                            accept="image/*"
+                                            multiple
+                                            onChange={handleImageChange}
+                                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#153563] focus:border-transparent text-[#153563] mb-2"
+                                        />
+                                        <p className="text-sm text-gray-500 mb-3">
+                                            Formats acceptés : JPG, PNG, WebP (max 10 images au total)
+                                        </p>
+
+                                        {/* Aperçu des nouvelles images */}
+                                        {newImages.length > 0 && (
+                                            <div className="mb-4">
+                                                <div className="flex items-center justify-between mb-2">
+                                                    <p className="text-sm font-medium text-gray-700">
+                                                        Nouvelles images ({newImages.length})
+                                                    </p>
+                                                    <button
+                                                        type="button"
+                                                        onClick={handleAddImages}
+                                                        disabled={uploadingImages}
+                                                        className="px-4 py-2 bg-[#153563] text-white text-sm rounded-lg hover:bg-[#1a4575] transition disabled:opacity-50"
+                                                    >
+                                                        {uploadingImages ? 'Ajout en cours...' : 'Ajouter ces images'}
+                                                    </button>
+                                                </div>
+                                                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                                                    {imagePreviews.map((preview, index) => (
+                                                        <div key={index} className="relative group">
+                                                            <img
+                                                                src={preview}
+                                                                alt={`Nouvelle image ${index + 1}`}
+                                                                className="w-full h-32 object-cover rounded-lg"
+                                                            />
+                                                            <button
+                                                                type="button"
+                                                                onClick={() => removeNewImage(index)}
+                                                                className="absolute top-2 right-2 bg-red-500 text-white p-1.5 rounded-full opacity-0 group-hover:opacity-100 transition"
+                                                            >
+                                                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                                                                </svg>
+                                                            </button>
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                            </div>
+                                        )}
+                                    </div>
+                                )}
+
+                                {existingImages.length >= 10 && (
+                                    <p className="text-sm text-gray-500 italic">
+                                        Vous avez atteint la limite de 10 images. Supprimez des images existantes pour en ajouter de nouvelles.
+                                    </p>
+                                )}
                             </div>
 
                             {/* Boutons */}
