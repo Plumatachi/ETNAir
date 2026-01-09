@@ -15,7 +15,7 @@ cache:
   image: node:18
   before_script:
     - cd etnair/api
-    - npm ci
+    - npm install
 
 test:
   stage: test
