@@ -40,6 +40,17 @@ export interface Home {
     home_image: HomeImage[];
 }
 
+export interface HomeFormData {
+    namehome: string;
+    description: string;
+    propertytype: PropertyType;
+    price: number;
+    address: string;
+    city: string;
+    postalcode: string;
+    country: string;
+}
+
 export function getPropertyTypeLabel(type: PropertyType): string {
     return PROPERTY_TYPE_LABELS[type] || type;
 }
