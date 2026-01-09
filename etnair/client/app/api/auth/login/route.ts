@@ -2,8 +2,6 @@ import { NextRequest, NextResponse } from 'next/server';
 
 export async function POST(request: NextRequest) {
     try {
-        console.log("HERE");
-
         const body = await request.json();
         const apiUrl = process.env.API_URL || 'http://localhost:3001';
         

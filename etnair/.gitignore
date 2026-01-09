@@ -44,7 +44,7 @@ docker-compose.yml
 docker-compose.*.yml
 
 # Package files
-package-lock.json
+#package-lock.json
 
 # Debug logs
 npm-debug.log*
