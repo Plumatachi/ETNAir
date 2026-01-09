@@ -14,7 +14,7 @@ cache:
 .default_node_job: &default_node_job
   image: node:18
   before_script:
-    - cd api
+    - cd etnair/api
     - npm ci
 
 test:
