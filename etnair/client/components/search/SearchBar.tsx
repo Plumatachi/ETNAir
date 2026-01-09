@@ -26,6 +26,13 @@ export default function SearchBar({ onSearch }: SearchBarProps) {
         });
     };
 
+    const handleClear = () => {
+        setLocation('');
+        setPriceMax('');
+        setPropertyType('');
+        onSearch({});
+    };
+
     return (
         <div className="relative w-full h-64 overflow-hidden">
             <img
@@ -72,6 +79,13 @@ export default function SearchBar({ onSearch }: SearchBarProps) {
                         className="bg-[#DA504E] text-white px-8 py-3 rounded font-medium hover:bg-[#c44543] transition"
                     >
                         Filtrer
+                    </button>
+                    <button
+                        type="button"
+                        onClick={handleClear}
+                        className="bg-gray-600 text-white px-6 py-3 rounded font-medium hover:bg-gray-700 transition"
+                    >
+                        Effacer
                     </button>
                 </form>
             </div>
