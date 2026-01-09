@@ -16,6 +16,17 @@ export default function RegisterModal({ isOpen, onClose, onSwitchToLogin }: Regi
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
 
+    const passwordRequirements = {
+        length: password.length >= 8,
+        uppercase: /[A-Z]/.test(password),
+        lowercase: /[a-z]/.test(password),
+        digit: /\d/.test(password),
+        special: /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password),
+    };
+
+    const isPasswordValid = Object.values(passwordRequirements).every(Boolean);
+    const isFormValid = username && email && isPasswordValid && usertype;
+
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setError('');
@@ -112,6 +123,28 @@ export default function RegisterModal({ isOpen, onClose, onSwitchToLogin }: Regi
                                 className="w-full px-3 py-2 border border-gray-300 text-[#153563] rounded-md bg-[#e8e7e7] focus:outline-none focus:ring-2 focus:ring-[#153563]"
                                 required
                             />
+                            <div className="mt-2 text-xs space-y-1">
+                                <p className={`flex items-center gap-2 ${passwordRequirements.length ? 'text-green-600' : 'text-gray-500'}`}>
+                                    <span className={`w-4 h-4 rounded-full ${passwordRequirements.length ? 'bg-green-600' : 'bg-gray-300'}`} />
+                                    Au moins 8 caractères
+                                </p>
+                                <p className={`flex items-center gap-2 ${passwordRequirements.uppercase ? 'text-green-600' : 'text-gray-500'}`}>
+                                    <span className={`w-4 h-4 rounded-full ${passwordRequirements.uppercase ? 'bg-green-600' : 'bg-gray-300'}`} />
+                                    Au moins 1 majuscule (A-Z)
+                                </p>
+                                <p className={`flex items-center gap-2 ${passwordRequirements.lowercase ? 'text-green-600' : 'text-gray-500'}`}>
+                                    <span className={`w-4 h-4 rounded-full ${passwordRequirements.lowercase ? 'bg-green-600' : 'bg-gray-300'}`} />
+                                    Au moins 1 minuscule (a-z)
+                                </p>
+                                <p className={`flex items-center gap-2 ${passwordRequirements.digit ? 'text-green-600' : 'text-gray-500'}`}>
+                                    <span className={`w-4 h-4 rounded-full ${passwordRequirements.digit ? 'bg-green-600' : 'bg-gray-300'}`} />
+                                    Au moins 1 chiffre (0-9)
+                                </p>
+                                <p className={`flex items-center gap-2 ${passwordRequirements.special ? 'text-green-600' : 'text-gray-500'}`}>
+                                    <span className={`w-4 h-4 rounded-full ${passwordRequirements.special ? 'bg-green-600' : 'bg-gray-300'}`} />
+                                    Au moins 1 caractère spécial (!@#$%^&* etc)
+                                </p>
+                            </div>
                         </div>
 
                         <div>
@@ -143,8 +176,8 @@ export default function RegisterModal({ isOpen, onClose, onSwitchToLogin }: Regi
 
                         <button
                             type="submit"
-                            disabled={loading}
-                            className="w-full bg-[#658adf] text-white py-2 rounded-md hover:bg-opacity-90 transition disabled:opacity-50"
+                            disabled={loading || !isFormValid}
+                            className="w-full bg-[#658adf] text-white py-2 rounded-md hover:bg-opacity-90 transition disabled:opacity-50 disabled:cursor-not-allowed"
                         >
                             {loading ? 'Validation...' : 'Valider'}
                         </button>
