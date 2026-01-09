@@ -1,8 +1,56 @@
-
 stages:
   - test
+  - security
+  - deploy
 
-hello-job:
+variables:
+  NODE_ENV: test
+  NPM_CONFIG_CACHE: "$CI_PROJECT_DIR/.npm"
+
+cache:
+  paths:
+    - .npm/
+
+.default_node_job: &default_node_job
+  image: node:18
+  before_script:
+    - cd etnair/api
+    - npm install --prefer-offline --no-audit
+
+test:
   stage: test
+  <<: *default_node_job
   script:
-    - echo "Hello, GitLab CI/CD!"
+    - |
+      if grep -q '"test":' package.json; then
+        echo "Exécution des tests..."
+        npm test
+      else
+        echo "ATTENTION : Aucun script 'test' trouvé dans package.json"
+        echo "-------------------------------------------------------"
+      fi
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+    - if: '$CI_COMMIT_BRANCH == "main"'
+
+security:
+  stage: security
+  <<: *default_node_job
+  script:
+    - npm audit --audit-level=high
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+    - if: '$CI_COMMIT_BRANCH == "main"'
+
+deploy:
+  stage: deploy
+  image:
+    name: bitnami/kubectl:latest
+    entrypoint: [""]
+  script:
+    - echo "Déploiement de l'API sur Kubernetes"
+    - kubectl config use-context "$KUBE_CONTEXT"
+    - kubectl apply -f k8s/secrets.yaml
+    - kubectl apply -f k8s/
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "main"'
