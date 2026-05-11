@@ -12,7 +12,7 @@ cache:
     - .npm/
 
 .default_node_job: &default_node_job
-  image: node:18
+  image: node:26
   before_script:
     - cd etnair/api
     - npm install --prefer-offline --no-audit
