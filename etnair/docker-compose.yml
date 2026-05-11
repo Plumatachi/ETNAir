@@ -1,6 +1,6 @@
 services:
   postgres:
-    image: postgres:16
+    image: postgres:18
     container_name: postgres_db
     environment:
       POSTGRES_USER: etnair_user
@@ -15,7 +15,7 @@ services:
       - "5432:5432"
 
   api:
-    image: node:22-alpine
+    image: node:26-alpine
     container_name: etnair_api
     working_dir: /app
     volumes:
